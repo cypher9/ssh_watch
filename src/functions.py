@@ -1,6 +1,5 @@
 import os
 import re
-import curses
 import xml.etree.ElementTree as ET
 from src.ssh_client import make_ssh_client
 from tabulate import tabulate
@@ -63,10 +62,3 @@ def parse_black_n_white():
 				whitelist.append(client.text)
 			elif child.tag == 'blacklist':
 				blacklist.append(client.text)
-
-
-def print_status(connected_clients, window):
-	status = tabulate(connected_clients, headers="keys")
-	window.addstr(0, 0, status)
-	window.refresh()
-	return status
