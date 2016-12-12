@@ -1,5 +1,6 @@
 import os
 import re
+import curses
 import xml.etree.ElementTree as ET
 from src.ssh_client import make_ssh_client
 from tabulate import tabulate
@@ -15,7 +16,7 @@ def remove_my_ip(connected_ip_list):
 		if ip == my_ip:
 			connected_ip_list.remove(ip)
 		else:
-			print "not found"
+			print("not found")
 	return connected_ip_list
 
 
@@ -64,6 +65,8 @@ def parse_black_n_white():
 				blacklist.append(client.text)
 
 
-def print_status(connected_clients):
+def print_status(connected_clients, window):
 	status = tabulate(connected_clients, headers="keys")
+	window.addstr(0, 0, status)
+	window.refresh()
 	return status
