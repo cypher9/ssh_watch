@@ -1,7 +1,8 @@
 import os
 import re
 import xml.etree.ElementTree as ET
-from src.ssh_client import make_ssh_client, SSHCLIENT
+from src.ssh_client import make_ssh_client
+from tabulate import tabulate
 
 
 def get_my_ip():
@@ -39,7 +40,7 @@ def parse_established_string(est_string):
 
 		ssh_client = make_ssh_client(client_ip, client_port, client_username, client_process_id)
 
-		connection_list.append(ssh_client)
+		connection_list.append(ssh_client.__dict__)
 
 	return connection_list
 
@@ -62,5 +63,7 @@ def parse_black_n_white():
 			elif child.tag == 'blacklist':
 				blacklist.append(client.text)
 
-	print whitelist
-	print blacklist
+
+def print_status(connected_clients):
+	status = tabulate(connected_clients, headers="keys")
+	return status
