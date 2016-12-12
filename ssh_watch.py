@@ -1,11 +1,13 @@
-from src import functions, ssh_client
-import re
+import time
+from src import functions
 
 
 def main():
-	print functions.get_connected_clients()
-	
-	# os.system("wall 'hallo du'")
+	while True:
+		time.sleep(1)
+		print functions.get_connected_clients()
+		functions.parse_black_n_white()
+		break
 	
 
 if __name__ == "__main__":

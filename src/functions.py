@@ -1,5 +1,6 @@
 import os
 import re
+import xml.etree.ElementTree as ET
 from src.ssh_client import make_ssh_client, SSHCLIENT
 
 
@@ -28,21 +29,16 @@ def get_ip_from_string(ip_string):
 def parse_established_string(est_string):
 	connection_list = []
 	est_list = filter(None, est_string.split('\n'))
-	# print est_list
 
 	for est_client in est_list:
 		client_info_list = filter(None, est_client.split(' '))
 		client_ip = get_ip_from_string(client_info_list[8])[0]
-		# print client_ip
 		client_port = client_info_list[8].split(':')[2]
-		# print client_port
 		client_username = client_info_list[2]
-		# print client_username
 		client_process_id = client_info_list[1]
-		# print client_process_id
 
 		ssh_client = make_ssh_client(client_ip, client_port, client_username, client_process_id)
-		# print ssh_client
+
 		connection_list.append(ssh_client)
 
 	return connection_list
@@ -51,3 +47,20 @@ def parse_established_string(est_string):
 def get_connected_clients():
 	client_list_string = get_established_string()
 	return parse_established_string(client_list_string)
+
+
+def parse_black_n_white():
+	whitelist = []
+	blacklist = []
+	black_n_white = "black_n_white/black_n_white.xml"
+	tree = ET.parse(black_n_white)
+	root = tree.getroot()
+	for child in root:
+		for client in child.iter('client'):
+			if child.tag == 'whitelist':
+				whitelist.append(client.text)
+			elif child.tag == 'blacklist':
+				blacklist.append(client.text)
+
+	print whitelist
+	print blacklist
