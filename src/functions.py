@@ -28,7 +28,7 @@ def get_ip_from_string(ip_string):
 def parse_established_string(est_string):
 	connection_list = []
 	est_list = filter(None, est_string.split('\n'))
-	print est_list
+	# print est_list
 
 	for est_client in est_list:
 		client_info_list = filter(None, est_client.split(' '))
@@ -41,11 +41,13 @@ def parse_established_string(est_string):
 		client_process_id = client_info_list[1]
 		# print client_process_id
 
-		connection_list.append(make_ssh_client(client_ip, client_port, client_username, client_process_id))
+		ssh_client = make_ssh_client(client_ip, client_port, client_username, client_process_id)
+		# print ssh_client
+		connection_list.append(ssh_client)
 
 	return connection_list
 
 
 def get_connected_clients():
 	client_list_string = get_established_string()
-	parse_established_string(client_list_string)
+	return parse_established_string(client_list_string)
