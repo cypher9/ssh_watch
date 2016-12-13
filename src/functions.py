@@ -2,7 +2,6 @@ import os
 import re
 import xml.etree.ElementTree as ET
 from src.ssh_client import make_ssh_client
-from tabulate import tabulate
 
 
 def get_my_ip():
@@ -50,15 +49,25 @@ def get_connected_clients():
 	return parse_established_string(client_list_string)
 
 
-def parse_black_n_white():
+def whitelisting(connected_clients, whitelist):
+	found = False
+	for client in connected_clients:
+		for ip in whitelist:
+			if ip in client.values():
+				found = True
+			else:
+				found = False
+	return found
+
+
+def parse_whitelist(whitelist_path):
 	whitelist = []
-	blacklist = []
-	black_n_white = "black_n_white/black_n_white.xml"
-	tree = ET.parse(black_n_white)
+	black_n_white_file = whitelist_path
+	tree = ET.parse(black_n_white_file)
 	root = tree.getroot()
 	for child in root:
 		for client in child.iter('client'):
 			if child.tag == 'whitelist':
 				whitelist.append(client.text)
-			elif child.tag == 'blacklist':
-				blacklist.append(client.text)
+
+	return whitelist
