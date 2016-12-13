@@ -7,10 +7,8 @@ BWPATH = "black_n_white/black_n_white.xml"  # path to the black_n_white.xml
 
 WHITELIST = True    # True for whitelisting, False for blacklisting
 
-KILLSWITCH = False  # kill ssh server if suspicious activity is detected
-KICKALIEN = True    # kill session of suspicious client
-
-
+KILLSERVER = False  # kill ssh server if suspicious activity is detected
+KILLSESSION = True    # kill session of suspicious client
 
 
 def monitor(window):
@@ -24,7 +22,7 @@ def monitor(window):
 				white_list = functions.parse_whitelist(BWPATH)
 				found = functions.whitelisting(connected_clients, white_list)
 				if found:
-					output.append("i found the ip")
+					output.insert(len(output), "i found the ip")
 		else:
 			output.append("no clients connected...")
 
