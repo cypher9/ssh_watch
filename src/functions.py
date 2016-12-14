@@ -1,7 +1,15 @@
 import os
 import re
-import xml.etree.ElementTree as ET
+import logging
+import xml.etree.ElementTree as et
+from tabulate import tabulate
 from src.ssh_client import make_ssh_client
+
+LOGPATH = "log/ssh_watch.log"  # path to save the LOG files
+
+logging.basicConfig(filename=LOGPATH, filemode='w',
+						format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+						level=logging.INFO)
 
 
 def get_my_ip():
@@ -49,18 +57,10 @@ def get_connected_clients():
 	return parse_established_string(client_list_string)
 
 
-def whitelisting(connected_clients, whitelist):
-	blacklist = []
-	for client in connected_clients:
-		if client.client_ip not in whitelist:
-			blacklist.append(client)
-	return blacklist
-
-
 def parse_whitelist(whitelist_path):
 	whitelist = []
 	black_n_white_file = whitelist_path
-	tree = ET.parse(black_n_white_file)
+	tree = et.parse(black_n_white_file)
 	root = tree.getroot()
 	for child in root:
 		for client in child.iter('client'):
@@ -70,6 +70,32 @@ def parse_whitelist(whitelist_path):
 	return whitelist
 
 
+def whitelisting(connected_clients, whitelist_path):
+	whitelist = parse_whitelist(whitelist_path)
+	blacklist = []
+	for client in connected_clients:
+		if client.client_ip not in whitelist:
+			blacklist.append(client)
+	kill_unknown_client(blacklist)
+
+
 def kill_unknown_client(blacklist):
 	for client in blacklist:
+		logging.info("unknown IP (" + client.client_ip + ") is connected to SSH Server")
 		os.popen("kill -9 " + str(client.client_process_id))
+		logging.info("killed session of: " + client.client_ip)
+
+
+def tabulate_client_output(connected_clients):
+	client_dict_list = []
+	for client in connected_clients:
+		client_dict_list.append(client.__dict__)
+	tab_clients = tabulate(client_dict_list, headers="keys")
+	return tab_clients
+
+
+def print_status(connected_clients, window):
+	output = tabulate_client_output(connected_clients)
+	window.clear()
+	window.addstr(0, 0, output)
+	window.refresh()
