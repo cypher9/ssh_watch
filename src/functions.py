@@ -7,12 +7,19 @@ from src.ssh_client import make_ssh_client
 
 LOGPATH = "log/ssh_watch.log"  # path to save the LOG files
 
-logging.basicConfig(filename=LOGPATH, format='%(asctime)s - [%(levelname)s] - %(message)s',
+logging.basicConfig(filename=LOGPATH, filemode='w', format='%(asctime)s - [%(levelname)s] - %(message)s',
 					level=logging.INFO)
 
 
 def get_my_ip():
 	return os.popen("hostname -I").read()
+
+
+def get_hash(connection_list):
+	dict_list = []
+	for client in connection_list:
+		dict_list.append(str(client))
+	return hash(frozenset(dict_list))
 
 
 def remove_my_ip(connected_ip_list):
@@ -75,14 +82,16 @@ def whitelisting(connected_clients, whitelist_path):
 	for client in connected_clients:
 		if client.client_ip not in whitelist:
 			blacklist.append(client)
+		else:
+			logging.info("User " + client.client_username + " with IP " + client.client_ip + " Connection ESTABLISHED")
 	kill_unknown_client(blacklist)
 
 
 def kill_unknown_client(blacklist):
 	for client in blacklist:
-		logging.info("User " + client.client_username + "with IP (" + client.client_ip + ") connects to SSH Server")
+		logging.warning("Unknown client detected: " + client.client_username + " - " + client.client_ip)
 		os.popen("kill -9 " + str(client.client_process_id))
-		logging.info("killed session of: " + client.client_username + " - " + client.client_ip)
+		logging.warning("killed session of: " + client.client_username + " - " + client.client_ip)
 
 
 def tabulate_client_output(connected_clients):
@@ -94,7 +103,10 @@ def tabulate_client_output(connected_clients):
 
 
 def print_status(connected_clients, window):
-	output = tabulate_client_output(connected_clients)
 	window.clear()
+	if connected_clients:
+		output = tabulate_client_output(connected_clients)
+	else:
+		output = "no clients connected..."
 	window.addstr(0, 0, output)
 	window.refresh()
