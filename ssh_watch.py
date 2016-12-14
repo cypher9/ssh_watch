@@ -3,7 +3,7 @@ import curses
 from src import functions, print_status
 
 LOGPATH = ""  # path to save the LOG files
-BWPATH = "black_n_white/black_n_white.xml"  # path to the black_n_white.xml
+BWPATH = "whitelist/whitelist.xml"  # path to the whitelist.xml
 
 WHITELIST = True    # True for whitelisting, False for blacklisting
 
@@ -20,9 +20,13 @@ def monitor(window):
 			output.append(print_status.tabulate_client_output(connected_clients))
 			if WHITELIST:
 				white_list = functions.parse_whitelist(BWPATH)
-				found = functions.whitelisting(connected_clients, white_list)
-				if found:
-					output.insert(len(output), "i found the ip")
+				blacklist = functions.whitelisting(connected_clients, white_list)
+				if blacklist:
+					output.insert(len(output), "unknown IP is connected to SSH Server")
+					functions.kill_unknown_client(blacklist)
+					for client in blacklist:
+						output.insert(len(output), "killed session of: " + client.client_ip)
+
 		else:
 			output.append("no clients connected...")
 

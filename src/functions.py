@@ -23,7 +23,7 @@ def get_established_string():
 
 
 def get_ip_from_string(ip_string):
-	return list(set(remove_my_ip(re.findall( r'[0-9]+(?:\.[0-9]+){3}', ip_string))))
+	return list(set(remove_my_ip(re.findall(r'[0-9]+(?:\.[0-9]+){3}', ip_string))))
 
 
 def parse_established_string(est_string):
@@ -39,7 +39,7 @@ def parse_established_string(est_string):
 
 		ssh_client = make_ssh_client(client_ip, client_port, client_username, client_process_id)
 
-		connection_list.append(ssh_client.__dict__)
+		connection_list.append(ssh_client)
 
 	return connection_list
 
@@ -50,14 +50,11 @@ def get_connected_clients():
 
 
 def whitelisting(connected_clients, whitelist):
-	found = False
+	blacklist = []
 	for client in connected_clients:
-		for ip in whitelist:
-			if ip in client.values():
-				found = True
-			else:
-				found = False
-	return found
+		if client.client_ip not in whitelist:
+			blacklist.append(client)
+	return blacklist
 
 
 def parse_whitelist(whitelist_path):
@@ -71,3 +68,8 @@ def parse_whitelist(whitelist_path):
 				whitelist.append(client.text)
 
 	return whitelist
+
+
+def kill_unknown_client(blacklist):
+	for client in blacklist:
+		os.popen("kill -9 " + str(client.client_process_id))

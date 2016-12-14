@@ -2,7 +2,10 @@ from tabulate import tabulate
 
 
 def tabulate_client_output(connected_clients):
-	tab_clients = tabulate(connected_clients, headers="keys")
+	client_dict_list = []
+	for client in connected_clients:
+		client_dict_list.append(client.__dict__)
+	tab_clients = tabulate(client_dict_list, headers="keys")
 	return tab_clients
 
 
