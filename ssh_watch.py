@@ -4,9 +4,6 @@ from src import functions
 
 BWPATH = "whitelist/whitelist.xml"  # path to the whitelist.xml
 
-KILLSERVER = False  # kill ssh server if suspicious activity is detected
-KILLSESSION = True    # kill session of suspicious client
-
 
 def main():
 

@@ -7,9 +7,8 @@ from src.ssh_client import make_ssh_client
 
 LOGPATH = "log/ssh_watch.log"  # path to save the LOG files
 
-logging.basicConfig(filename=LOGPATH, filemode='w',
-						format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-						level=logging.INFO)
+logging.basicConfig(filename=LOGPATH, format='%(asctime)s - [%(levelname)s] - %(message)s',
+					level=logging.INFO)
 
 
 def get_my_ip():
@@ -81,9 +80,9 @@ def whitelisting(connected_clients, whitelist_path):
 
 def kill_unknown_client(blacklist):
 	for client in blacklist:
-		logging.info("unknown IP (" + client.client_ip + ") is connected to SSH Server")
+		logging.info("User " + client.client_username + "with IP (" + client.client_ip + ") connects to SSH Server")
 		os.popen("kill -9 " + str(client.client_process_id))
-		logging.info("killed session of: " + client.client_ip)
+		logging.info("killed session of: " + client.client_username + " - " + client.client_ip)
 
 
 def tabulate_client_output(connected_clients):
