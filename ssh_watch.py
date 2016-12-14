@@ -8,7 +8,7 @@ BWPATH = "whitelist/whitelist.xml"  # path to the whitelist.xml
 def main():
 
 	window = curses.initscr()
-	old_connection_list = [1, 1]
+	old_connection_list = []
 
 	while True:
 		time.sleep(1)
